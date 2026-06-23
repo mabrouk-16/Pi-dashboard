@@ -1,0 +1,36 @@
+.app-toolbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    .toolbar-content {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .toolbar-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        mat-icon {
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+        }
+    }
+}
+
+.app-content {
+    min-height: calc(100vh - 64px);
+    background-color: #fafafa;
+}
