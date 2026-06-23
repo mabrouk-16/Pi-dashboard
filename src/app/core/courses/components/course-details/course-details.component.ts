@@ -16,6 +16,7 @@ import { Course } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
 import { UrlsNames } from '../../../../shared/models/urlsNames';
 import { finalize } from 'rxjs';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-course-details',
@@ -28,12 +29,14 @@ import { finalize } from 'rxjs';
     MatProgressSpinnerModule,
     CurrencyPipe,
   ],
+  providers: [ToastService],
   templateUrl: './course-details.component.html',
   styleUrls: ['./course-details.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CourseDetailsComponent implements OnInit {
   private courseService = inject(CourseService);
+  private toastService = inject(ToastService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -51,8 +54,13 @@ export class CourseDetailsComponent implements OnInit {
     this.courseService
       .getCourseById(courseId)
       .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe((course) => {
-        this.course.set(course || null);
+      .subscribe({
+        next: (course) => {
+          this.course.set(course || null);
+        },
+        error: () => {
+          this.toastService.error('Failed to load course. Please try again.');
+        },
       });
   }
 

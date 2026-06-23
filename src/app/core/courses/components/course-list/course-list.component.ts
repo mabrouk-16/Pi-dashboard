@@ -23,6 +23,7 @@ import { CourseService } from '../../services/course.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { UrlsNames } from '../../../../shared/models/urlsNames';
 import { finalize } from 'rxjs/internal/operators/finalize';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-course-list',
@@ -42,12 +43,14 @@ import { finalize } from 'rxjs/internal/operators/finalize';
     MatTooltipModule,
     CurrencyPipe,
   ],
+  providers: [ToastService],
   templateUrl: './course-list.component.html',
   styleUrls: ['./course-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CourseListComponent {
   private courseService = inject(CourseService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
   private dialog = inject(MatDialog);
 
@@ -82,9 +85,14 @@ export class CourseListComponent {
     this.courseService
       .getAllCourses()
       .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe((courses) => {
-        this.courses.set(courses);
-        this.applyFilters();
+      .subscribe({
+        next: (courses) => {
+          this.courses.set(courses);
+          this.applyFilters();
+        },
+        error: () => {
+          this.toastService.error('Failed to load courses. Please try again.');
+        },
       });
   }
 
@@ -124,8 +132,16 @@ export class CourseListComponent {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.courseService.deleteCourse(course.id).subscribe(() => {
-          this.loadCourses();
+        this.courseService.deleteCourse(course.id).subscribe({
+          next: () => {
+            this.loadCourses();
+            this.toastService.success('Course deleted successfully.');
+          },
+          error: (err) => {
+            this.toastService.error(
+              'Failed to delete course. Please try again.',
+            );
+          },
         });
       }
     });

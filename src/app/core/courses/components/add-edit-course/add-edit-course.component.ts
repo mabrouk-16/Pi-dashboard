@@ -22,6 +22,7 @@ import { CourseStatus } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
 import { UrlsNames } from '../../../../shared/models/urlsNames';
 import { finalize } from 'rxjs/internal/operators/finalize';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-add-edit-course',
@@ -36,6 +37,7 @@ import { finalize } from 'rxjs/internal/operators/finalize';
     MatProgressSpinnerModule,
     MatIconModule,
   ],
+  providers: [ToastService],
   templateUrl: './add-edit-course.component.html',
   styleUrls: ['./add-edit-course.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +45,7 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 export class AddEditCourseComponent {
   private fb = inject(FormBuilder);
   private courseService = inject(CourseService);
+  private toastService = inject(ToastService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -109,10 +112,15 @@ export class AddEditCourseComponent {
     this.courseService
       .getCourseById(courseId)
       .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe((course) => {
-        if (course) {
-          this.courseForm.patchValue(course);
-        }
+      .subscribe({
+        next: (course) => {
+          if (course) {
+            this.courseForm.patchValue(course);
+          }
+        },
+        error: () => {
+          this.toastService.error('Failed to load course. Please try again.');
+        },
       });
   }
 
@@ -130,14 +138,25 @@ export class AddEditCourseComponent {
       this.isEditMode() && courseId
         ? this.courseService.updateCourse(courseId, formData)
         : this.courseService.addCourse(formData);
-    req$.pipe(finalize(() => this.submitLoading.set(false))).subscribe(
-      () => {
-        this.router.navigate(['/', UrlsNames.COURSES]);
+    req$.pipe(finalize(() => this.submitLoading.set(false))).subscribe({
+      next: () => {
+        this.router.navigate(['/', UrlsNames.COURSES]).then(() => {
+          this.toastService.success(
+            this.isEditMode()
+              ? 'Course updated successfully.'
+              : 'Course added successfully.',
+          );
+        });
       },
-      (error) => {
+      error: (error) => {
         console.error('Error updating course:', error);
+        this.toastService.error(
+          this.isEditMode()
+            ? 'Failed to update course. Please try again.'
+            : 'Failed to add course. Please try again.',
+        );
       },
-    );
+    });
   }
 
   onCancel(): void {

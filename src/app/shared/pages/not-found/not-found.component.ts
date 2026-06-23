@@ -14,6 +14,7 @@ import { UrlsNames } from '../../models/urlsNames';
 })
 export class NotFoundComponent {
   private router = inject(Router);
+
   goToMain(): void {
     this.router.navigate([`/${UrlsNames.COURSES}`]);
   }
