@@ -15,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { CourseStatus } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
+import { UrlsNames } from '../../../../shared/models/urlsNames';
 
 @Component({
   selector: 'app-add-edit-course',
@@ -44,7 +45,7 @@ export class AddEditCourseComponent{
   isLoading = signal(false);
   courseId = signal<string | undefined>(undefined);
   submitLoading = signal(false);
-  
+
   categories = [
     'Frontend',
     'Backend',
@@ -120,7 +121,7 @@ export class AddEditCourseComponent{
       this.courseService.updateCourse(courseId, formData).subscribe(
         () => {
           this.submitLoading.set(false);
-          this.router.navigate(['/courses']);
+          this.router.navigate(['/', UrlsNames.COURSES]);
         },
         (error) => {
           this.submitLoading.set(false);
@@ -131,7 +132,7 @@ export class AddEditCourseComponent{
       this.courseService.addCourse(formData).subscribe(
         () => {
           this.submitLoading.set(false);
-          this.router.navigate(['/courses']);
+          this.router.navigate(['/', UrlsNames.COURSES]);
         },
         (error) => {
           this.submitLoading.set(false);
@@ -142,7 +143,7 @@ export class AddEditCourseComponent{
   }
 
   onCancel(): void {
-    this.router.navigate(['/courses']);
+    this.router.navigate(['/', UrlsNames.COURSES]);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

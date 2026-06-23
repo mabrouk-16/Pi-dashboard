@@ -22,6 +22,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Course, CourseStatus } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { UrlsNames } from '../../../../shared/models/urlsNames';
 
 @Component({
   selector: 'app-course-list',
@@ -106,11 +107,11 @@ export class CourseListComponent implements OnInit {
   }
 
   viewCourse(course: Course): void {
-    this.router.navigate(['/courses', course.id]);
+    this.router.navigate(['/', UrlsNames.COURSES, course.id]);
   }
 
   editCourse(course: Course): void {
-    this.router.navigate(['/courses/edit', course.id]);
+    this.router.navigate(['/', UrlsNames.COURSES, UrlsNames.EDIT, course.id]);
   }
 
   deleteCourse(course: Course): void {
@@ -131,7 +132,7 @@ export class CourseListComponent implements OnInit {
   }
 
   addNewCourse(): void {
-    this.router.navigate(['/courses/add']);
+    this.router.navigate(['/', UrlsNames.COURSES, UrlsNames.ADD]);
   }
 
   getStatusColor(status: CourseStatus): string {
