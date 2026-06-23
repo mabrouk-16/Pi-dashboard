@@ -18,6 +18,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
 import { Course, CourseStatus } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -41,6 +42,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
     MatDialogModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    MatMenuModule,
     CurrencyPipe,
   ],
   providers: [ToastService],
@@ -150,7 +152,6 @@ export class CourseListComponent {
   addNewCourse(): void {
     this.router.navigate(['/', UrlsNames.COURSES, UrlsNames.ADD]);
   }
-
   getStatusColor(status: CourseStatus): string {
     switch (status) {
       case CourseStatus.Active:
