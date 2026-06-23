@@ -153,16 +153,5 @@ export class CourseListComponent {
   addNewCourse(): void {
     this.router.navigate(['/', UrlsNames.COURSES, UrlsNames.ADD]);
   }
-  getStatusColor(status: CourseStatus): string {
-    switch (status) {
-      case CourseStatus.Active:
-        return 'accent';
-      case CourseStatus.Draft:
-        return 'warn';
-      case CourseStatus.Archived:
-        return 'primary';
-      default:
-        return 'primary';
-    }
-  }
+ 
 }
