@@ -1,0 +1,175 @@
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <h1>{{ isEditMode() ? "Edit Course" : "Add New Course" }}</h1>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (isLoading()) {
+        <div class="loading-container">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+      } @else {
+        <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Course Name</mat-label>
+              <input
+                matInput
+                formControlName="courseName"
+                placeholder="Enter course name"
+              />
+              <mat-icon matPrefix>title</mat-icon>
+              @if (isFieldInvalid("courseName")) {
+                <mat-error>
+                  {{ getErrorMessage("courseName") }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Instructor Name</mat-label>
+              <input
+                matInput
+                formControlName="instructorName"
+                placeholder="Enter instructor name"
+              />
+              <mat-icon matPrefix>person</mat-icon>
+              @if (isFieldInvalid("instructorName")) {
+                <mat-error>
+                  {{ getErrorMessage("instructorName") }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="category">
+                  @for (category of categories; track $index) {
+                    <mat-option [value]="category">
+                      {{ category }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (isFieldInvalid("category")) {
+                  <mat-error>
+                    {{ getErrorMessage("category") }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="form-group">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Duration (Hours)</mat-label>
+                <input
+                  matInput
+                  formControlName="duration"
+                  placeholder="Enter duration in hours"
+                  type="number"
+                />
+                <mat-icon matPrefix>schedule</mat-icon>
+                @if (isFieldInvalid("duration")) {
+                  <mat-error>
+                    {{ getErrorMessage("duration") }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Price</mat-label>
+                <input
+                  matInput
+                  formControlName="price"
+                  placeholder="Enter price"
+                  type="number"
+                  step="0.01"
+                />
+                <mat-icon matPrefix>attach_money</mat-icon>
+                @if (isFieldInvalid("price")) {
+                  <mat-error>
+                    {{ getErrorMessage("price") }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="form-group">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                  @for (status of statusOptions; track $index) {
+                    <mat-option [value]="status">
+                      {{ status }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (isFieldInvalid("status")) {
+                  <mat-error>
+                    {{ getErrorMessage("status") }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description (Optional)</mat-label>
+              <textarea
+                matInput
+                formControlName="description"
+                placeholder="Enter course description"
+                rows="4"
+              ></textarea>
+              <mat-hint align="end">
+                {{ courseForm.get("description")?.value?.length || 0 }}/500
+              </mat-hint>
+              @if (isFieldInvalid("description")) {
+                <mat-error>
+                  {{ getErrorMessage("description") }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="submitLoading()"
+            >
+              @if (submitLoading()) {
+                <mat-spinner diameter="20" class="spinner-button"></mat-spinner>
+              } @else {
+                <mat-icon>save</mat-icon>
+              }
+              {{ isEditMode() ? "Update Course" : "Add Course" }}
+            </button>
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="onCancel()"
+              [disabled]="submitLoading()"
+            >
+              <mat-icon>cancel</mat-icon>
+              Cancel
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

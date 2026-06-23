@@ -1,0 +1,126 @@
+<div class="details-container">
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  } @else if (course()) {
+    <section class="course-details">
+      <div class="header">
+        <button mat-icon-button color="primary" (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1>{{ course()?.courseName }}</h1>
+        <button mat-raised-button color="accent" (click)="editCourse()">
+          <mat-icon>edit</mat-icon>
+          Edit Course
+        </button>
+      </div>
+
+      <div class="details-grid">
+        <mat-card class="detail-card">
+          <mat-card-header>
+            <mat-card-title>Basic Information</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>title</mat-icon>
+                Course Name:
+              </span>
+              <span class="value">{{ course()?.courseName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>person</mat-icon>
+                Instructor:
+              </span>
+              <span class="value">{{ course()?.instructorName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>category</mat-icon>
+                Category:
+              </span>
+              <span class="value">{{ course()?.category }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>schedule</mat-icon>
+                Duration:
+              </span>
+              <span class="value">{{ course()?.duration }} hours</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="detail-card">
+          <mat-card-header>
+            <mat-card-title>Pricing & Status</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>attach_money</mat-icon>
+                Price:
+              </span>
+              <span class="value">{{ course()?.price | currency }}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>flag</mat-icon>
+                Status:
+              </span>
+              @if (course()?.status) {
+                <mat-chip
+                  [color]="getStatusColor(course()?.status || '')"
+                  selected
+                >
+                  {{ course()?.status }}
+                </mat-chip>
+              }
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>calendar_today</mat-icon>
+                Created Date:
+              </span>
+              <span class="value">{{ course()?.createdDate }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        @if (course()?.description) {
+          <mat-card class="detail-card full-width">
+            <mat-card-header>
+              <mat-card-title>Description</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="description-text">{{ course()?.description }}</p>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="goBack()">
+          <mat-icon>list</mat-icon>
+          Back to Courses
+        </button>
+        <button mat-raised-button color="accent" (click)="editCourse()">
+          <mat-icon>edit</mat-icon>
+          Edit Course
+        </button>
+      </div>
+    </section>
+  } @else {
+    <div class="not-found">
+      <mat-icon>error_outline</mat-icon>
+      <h2>Course Not Found</h2>
+      <p>The course you're looking for doesn't exist.</p>
+      <button mat-raised-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Courses
+      </button>
+    </div>
+  }
+</div>
