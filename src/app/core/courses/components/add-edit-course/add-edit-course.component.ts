@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -16,6 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CourseStatus } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
 import { UrlsNames } from '../../../../shared/models/urlsNames';
+import { finalize } from 'rxjs/internal/operators/finalize';
 
 @Component({
   selector: 'app-add-edit-course',
@@ -34,7 +40,7 @@ import { UrlsNames } from '../../../../shared/models/urlsNames';
   styleUrls: ['./add-edit-course.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddEditCourseComponent{
+export class AddEditCourseComponent {
   private fb = inject(FormBuilder);
   private courseService = inject(CourseService);
   private route = inject(ActivatedRoute);
@@ -100,12 +106,14 @@ export class AddEditCourseComponent{
     if (!courseId) return;
 
     this.isLoading.set(true);
-    this.courseService.getCourseById(courseId).subscribe((course) => {
-      this.isLoading.set(false);
-      if (course) {
-        this.courseForm.patchValue(course);
-      }
-    });
+    this.courseService
+      .getCourseById(courseId)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe((course) => {
+        if (course) {
+          this.courseForm.patchValue(course);
+        }
+      });
   }
 
   onSubmit(): void {
@@ -117,29 +125,19 @@ export class AddEditCourseComponent{
     this.submitLoading.set(true);
     const formData = this.courseForm.value;
     const courseId = this.courseId();
-    if (this.isEditMode() && courseId) {
-      this.courseService.updateCourse(courseId, formData).subscribe(
-        () => {
-          this.submitLoading.set(false);
-          this.router.navigate(['/', UrlsNames.COURSES]);
-        },
-        (error) => {
-          this.submitLoading.set(false);
-          console.error('Error updating course:', error);
-        },
-      );
-    } else {
-      this.courseService.addCourse(formData).subscribe(
-        () => {
-          this.submitLoading.set(false);
-          this.router.navigate(['/', UrlsNames.COURSES]);
-        },
-        (error) => {
-          this.submitLoading.set(false);
-          console.error('Error adding course:', error);
-        },
-      );
-    }
+
+    let req$ =
+      this.isEditMode() && courseId
+        ? this.courseService.updateCourse(courseId, formData)
+        : this.courseService.addCourse(formData);
+    req$.pipe(finalize(() => this.submitLoading.set(false))).subscribe(
+      () => {
+        this.router.navigate(['/', UrlsNames.COURSES]);
+      },
+      (error) => {
+        console.error('Error updating course:', error);
+      },
+    );
   }
 
   onCancel(): void {

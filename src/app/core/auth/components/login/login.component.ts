@@ -16,6 +16,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 import { UrlsNames } from '../../../../shared/models/urlsNames';
+import { finalize } from 'rxjs/internal/operators/finalize';
 
 @Component({
   selector: 'app-login',
@@ -68,21 +69,22 @@ export class LoginComponent implements OnInit {
     this.isLoading.set(true);
     const credentials = this.loginForm.value;
 
-    this.authService.login(credentials).subscribe((response) => {
-      this.isLoading.set(false);
-
-      if (response.success) {
-        this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
-        this.router.navigate(['/', UrlsNames.COURSES]);
-      } else {
-        this.snackBar.open(response.message, 'Close', {
-          duration: 5000,
-          panelClass: ['error-snackbar'],
-        });
-        // Clear password field
-        this.loginForm.patchValue({ password: '' });
-      }
-    });
+    this.authService
+      .login(credentials)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe((response) => {
+        if (response.success) {
+          this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
+          this.router.navigate(['/', UrlsNames.COURSES]);
+        } else {
+          this.snackBar.open(response.message, 'Close', {
+            duration: 5000,
+            panelClass: ['error-snackbar'],
+          });
+          // Clear password field
+          this.loginForm.patchValue({ password: '' });
+        }
+      });
   }
 
   togglePasswordVisibility(): void {

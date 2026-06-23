@@ -15,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Course } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
 import { UrlsNames } from '../../../../shared/models/urlsNames';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-course-details',
@@ -47,10 +48,12 @@ export class CourseDetailsComponent implements OnInit {
   }
 
   private loadCourse(courseId: string): void {
-    this.courseService.getCourseById(courseId).subscribe((course) => {
-      this.course.set(course || null);
-      this.isLoading.set(false);
-    });
+    this.courseService
+      .getCourseById(courseId)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe((course) => {
+        this.course.set(course || null);
+      });
   }
 
   goBack(): void {

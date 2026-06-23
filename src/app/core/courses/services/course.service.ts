@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Course, CourseStatus } from '../models/course.model';
 import { sampleCourses } from '../models/couses-list';
@@ -13,8 +13,6 @@ export class CourseService {
     this.loadCoursesFromStorage(),
   );
   public courses$ = this.coursesSubject.asObservable();
-  private loadingSubject = new BehaviorSubject<boolean>(false);
-  public loading$ = this.loadingSubject.asObservable();
 
   constructor() {
     this.initializeSampleData();
@@ -51,7 +49,6 @@ export class CourseService {
 
   addCourse(course: Omit<Course, 'id' | 'createdDate'>): Observable<Course> {
     return new Observable((observer) => {
-      this.loadingSubject.next(true);
       setTimeout(() => {
         const courses = this.coursesSubject.value;
         const newCourse: Course = {
@@ -61,7 +58,7 @@ export class CourseService {
         };
         courses.push(newCourse);
         this.saveCoursesToStorage(courses);
-        this.loadingSubject.next(false);
+
         observer.next(newCourse);
         observer.complete();
       }, 300);
@@ -70,18 +67,16 @@ export class CourseService {
 
   updateCourse(id: string, course: Partial<Course>): Observable<Course> {
     return new Observable((observer) => {
-      this.loadingSubject.next(true);
       setTimeout(() => {
         const courses = this.coursesSubject.value;
         const index = courses.findIndex((c) => c.id === id);
         if (index !== -1) {
           courses[index] = { ...courses[index], ...course, id };
           this.saveCoursesToStorage(courses);
-          this.loadingSubject.next(false);
+
           observer.next(courses[index]);
           observer.complete();
         } else {
-          this.loadingSubject.next(false);
           observer.error('Course not found');
         }
       }, 300);
@@ -90,12 +85,11 @@ export class CourseService {
 
   deleteCourse(id: string): Observable<boolean> {
     return new Observable((observer) => {
-      this.loadingSubject.next(true);
       setTimeout(() => {
         const courses = this.coursesSubject.value;
         const filteredCourses = courses.filter((c) => c.id !== id);
         this.saveCoursesToStorage(filteredCourses);
-        this.loadingSubject.next(false);
+
         observer.next(true);
         observer.complete();
       }, 300);

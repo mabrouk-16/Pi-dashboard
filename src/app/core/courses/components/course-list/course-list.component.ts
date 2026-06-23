@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  OnInit,
   signal,
 } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
@@ -23,6 +22,7 @@ import { Course, CourseStatus } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { UrlsNames } from '../../../../shared/models/urlsNames';
+import { finalize } from 'rxjs/internal/operators/finalize';
 
 @Component({
   selector: 'app-course-list',
@@ -46,7 +46,7 @@ import { UrlsNames } from '../../../../shared/models/urlsNames';
   styleUrls: ['./course-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CourseListComponent implements OnInit {
+export class CourseListComponent {
   private courseService = inject(CourseService);
   private router = inject(Router);
   private dialog = inject(MatDialog);
@@ -73,21 +73,19 @@ export class CourseListComponent implements OnInit {
     CourseStatus.Archived,
   ];
 
-  constructor() {}
-
   ngOnInit(): void {
     this.loadCourses();
   }
 
   loadCourses(): void {
-    this.courseService.loading$.subscribe((loading) => {
-      this.isLoading.set(loading);
-    });
-
-    this.courseService.getAllCourses().subscribe((courses) => {
-      this.courses.set(courses);
-      this.applyFilters();
-    });
+    this.isLoading.set(true);
+    this.courseService
+      .getAllCourses()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe((courses) => {
+        this.courses.set(courses);
+        this.applyFilters();
+      });
   }
 
   onSearch(): void {
@@ -99,8 +97,10 @@ export class CourseListComponent implements OnInit {
   }
 
   applyFilters(): void {
+    this.isLoading.set(true);
     this.courseService
       .searchCourses(this.searchTerm(), this.selectedStatus() || undefined)
+      .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe((filtered) => {
         this.filteredCourses.set(filtered);
       });
