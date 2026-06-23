@@ -129,3 +129,20 @@
         flex-wrap: wrap;
     }
 }
+
+:host ::ng-deep .mdc-evolution-chip__text-label {
+    color: white !important;
+}
+
+// Status chip colors
+.status-active {
+    background-color: #ff4081 !important;
+}
+
+.status-draft {
+    background-color: #f44336 !important;
+}
+
+.status-archived {
+    background-color: #1976d2 !important;
+}
